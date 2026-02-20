@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name ="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de site</title>
+</head>
+
+<body>
+    <h1>Criação de Usuário</h1>
+
+    <!--Formulário-->
+    <div>
+        <label for="id">ID:</label>
+        <input type="text" id="id">
+    </div>
+
+    <div>
+        <label for="nome">NOME:</label>
+        <input type="text" id="nome">
+    </div>
+
+    <div>
+        <label for="email">EMAIL:</label>
+        <input type="text" id="email">
+    </div>
+
+    <div>
+        <label for="password">SENHA:</label>
+        <input type="text" id="password">
+    </div>
+
+    <!--Botões-->
+        <button onclick="registrar()" style="background-color: red; color: white;">Registrar</button>
+        <button onclick="atualizar()" style="background-color: green; color: white;">Atualizar</button>
+        <button onclick="deletar()" style="background-color: black; color: white;">Deletar</button>
+        <button onclick="consultarporid()" style="background-color: blue; color: white;">Consultar</button>
+        <button onclick="limparCampos()" style="background-color: crimson; color: white;">Limpar Campos</button>
+
+    <!--Tabela-->
+
+    <h2>Usuários</h2>
+     <p id="total-usuario"></p>
+
+    <table id="tabelaInfo" border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>NOME</th>
+                <th>EMAIL</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <!--Mensagem de Erro-->
+    <p id="erroMensagem" style="color: red; display: none;">Erro ao carregar Usuários</p>
+
+        <script>
+            const BASE_URL = "http://localhost:8080/users"
+
+            function getUsuarioFromForm() {
+                return {
+                    nome: document.getElementById("nome").value,
+                    email: document.getElementById("email").value,
+                    password: document.getElementById("password").value
+                };
+            }
+
+            function mostrarUsuario() {
+                
+                fetch(BASE_URL)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error("Erro: " + response.status);
+                            }
+                            return response.json();
+                        })
+                        .then(data=> {
+                            const tableBody = document
+                            .getElementById("tabelaInfo")
+                            .getElementsByTagName("tbody")[0];
+
+                            //Limpa a tabela antes de preencher
+                            tableBody.innerHTML = "";
+
+                            let totalUsuario = 0;
+
+                            data.forEach(usuario => {
+                                const row = tableBody.insertRow();
+                                row.insertCell(0).textContent = usuario.id;
+                                row.insertCell(1).textContent = usuario.nome;
+                                row.insertCell(2).textContent = usuario.email;
+
+                                totalUsuario ++;
+                            });
+
+                            //Mostrar total
+                            document.getElementById("total-usuario").textContent = 
+                            "Total de Usuários: " + totalUsuario;
+
+                            //Esconde erro se tudo der certo
+                            document.getElementById("erroMensagem").style.display = "none";
+                        }).catch(error => {
+                            console.error("Erro ao buscar Usuário:", error);
+                            document.getElementById("erroMensagem").style.display ="block";
+                        });
+            }
+
+            async function registrar(){
+                const usuario = getUsuarioFromForm();
+
+                await fetch(BASE_URL , {
+                    method: "POST",
+                    headers: {"Content-Type" : "application/json"},
+                    body: JSON.stringify(usuario)
+                });
+                mostrarUsuario();
+            }
+
+            async function atualizar() {
+                const usuario = getUsuarioFromForm();
+                const id = document.getElementById("id").value;                
+
+                if(!id) {
+                    alert("Informe o ID para atualizar");
+                    return;
+                }
+
+                await fetch(`${BASE_URL}/${id}`,{
+                    method:"PUT",
+                    headers: {"Content-Type" : "application/json"},
+                    body: JSON.stringify(usuario)
+                });
+                mostrarUsuario();
+            }  
+
+            async function deletar() {
+                const id = document.getElementById("id").value;
+
+                await fetch(`${BASE_URL}/${id}`, {
+                    method: "DELETE"
+                });
+                mostrarUsuario();
+            }
+
+            function consultarporid(){
+                const id = document.getElementById("id").value;
+
+                fetch(`${BASE_URL}/${id}`, )
+                .then(response => response.json())
+                .then(usuario => {
+                    document.getElementById("nome").value = usuario.nome;
+                    document.getElementById("email").value = usuario.email;
+                })
+                .catch(error => console.error("Erro ao consultar Usuários:" , error));
+            }
+
+            function limparCampos() {
+                document.getElementById("id").value = "";
+                document.getElementById("nome").value = "";
+                document.getElementById("email").value = "";
+                document.getElementById("password").value = "";
+
+            }
+                        document.addEventListener("DOMContentLoaded", mostrarUsuario);
+
+        </script>
+</body>
+</html>
