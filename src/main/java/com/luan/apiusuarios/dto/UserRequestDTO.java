@@ -10,7 +10,7 @@ public class UserRequestDTO {
 	private String nome;
 	
 	@NotBlank(message = "Email é obrigatório")
-	@Email(message = "Email inválido")
+	@Email(message = "Email inválido")//no email precisa so ter o arroba 
 	private String email;
 	
 	@NotBlank(message = "Senha é obrigatória")
