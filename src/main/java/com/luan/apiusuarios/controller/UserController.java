@@ -8,11 +8,12 @@ import org.springframework.web.bind.annotation.*;
 import com.luan.apiusuarios.dto.UserRequestDTO;
 import com.luan.apiusuarios.dto.UserResponseDTO;
 import jakarta.validation.Valid;
-
+import com.luan.apiusuarios.dto.UserPatchDTO;
 
 
 import java.util.List;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -63,5 +64,13 @@ public class UserController {
 	    userService.delete(id);
 	    return ResponseEntity.noContent().build();
 	}
+	
+	//Patch
+	@PatchMapping("/{id}")
+	public ResponseEntity<UserResponseDTO> partialUpdate(
+	        @PathVariable Long id,
+	        @RequestBody UserPatchDTO dto) {
 
+	    return ResponseEntity.ok(userService.partialUpdate(id, dto));
+	}
 }
