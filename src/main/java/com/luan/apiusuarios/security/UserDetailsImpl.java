@@ -1,6 +1,7 @@
 package com.luan.apiusuarios.security;
 
-import com.luan.apiusuarios.entity.User;
+
+import com.luan.apiusuarios.model.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.GrantedAuthority;
 
