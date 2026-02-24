@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.luan.apiusuarios.dto.UserRequestDTO;
 import com.luan.apiusuarios.dto.UserResponseDTO;
+import com.luan.apiusuarios.dto.UserPatchDTO;
 
 import java.util.List;
 
@@ -17,6 +18,14 @@ public class UserServiceImpl implements UserService{
 
 	private final UserRepository userRepository;
 	private final BCryptPasswordEncoder passwordEncoder;
+	private UserResponseDTO toResponseDTO(User user) {
+	    return new UserResponseDTO(
+	            user.getId(),
+	            user.getNome(),
+	            user.getEmail()
+	    );
+	}
+	
 	
 	public UserServiceImpl (UserRepository userRepository) {
 		this.userRepository = userRepository;
@@ -94,6 +103,21 @@ public class UserServiceImpl implements UserService{
 	            .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 
 	    userRepository.delete(user);
+	}
+	
+	public UserResponseDTO partialUpdate(Long id, UserPatchDTO dto) {
+		User user = userRepository.findById(id)
+				.orElseThrow(()-> new ResourceNotFoundException("Usuário não encontrado"));
+		if (dto.getNome() != null) {
+			user.setNome(dto.getNome());
+		}
+		if (dto.getEmail() != null) {
+			user.setEmail(dto.getEmail());
+		}
+		
+		userRepository.save(user);
+		
+		return toResponseDTO(user);
 	}
 
 }
